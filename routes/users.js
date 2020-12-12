@@ -2,13 +2,14 @@
 
 const express = require('express');
 const { asyncHandler } = require('../middleware/async-handler');
+const { authenticateUser } = require('../middleware/auth-user');
 const { User } = require('../models');
 
 // Constructs router instance
 const router = express.Router();
 
 // GET currently authenticated user
-router.get('/users', asyncHandler(async (req, res) => {
+router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
     res.status(200).json({
         firstName: req.currentUser.firstName,
         lastName: req.currentUser.lastName,

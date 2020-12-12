@@ -1,5 +1,6 @@
 const express = require('express');
 const { asyncHandler } = require('../middleware/async-handler');
+const { authenticateUser } = require('../middleware/auth-user');
 const { Course, User } = require('../models');
 
 // Constructs router instance
@@ -40,7 +41,7 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 }));
 
 // POST create new course
-router.post('/courses', asyncHandler(async (req, res) => {
+router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     try {
         let course = await Course.create(req.body);
         return res.status(201).location(`/courses/${course.id}`).end();
@@ -55,7 +56,7 @@ router.post('/courses', asyncHandler(async (req, res) => {
 }));
 
 // PUT update corresponding course
-router.put('/courses/:id', asyncHandler(async (req, res) => {
+router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id);
     try {
         if (course && course.userId === req.currentUser.id) {
@@ -76,7 +77,7 @@ router.put('/courses/:id', asyncHandler(async (req, res) => {
 }));
 
 // DELETE delete corresponding course
-router.delete('/courses/:id', asyncHandler(async (req, res) => {
+router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     const course = await Course.findByPk(req.params.id);
     if (course) {
         if (req.currentUser.id !== course.userId) {
