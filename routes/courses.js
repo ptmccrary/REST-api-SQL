@@ -61,7 +61,7 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     try {
         if (course && course.userId === req.currentUser.id) {
             await course.update(req.body);
-            return res.status(204).location('/');
+            return res.status(204).location('/').end();
         } else {
             return res.status(403)
         }
