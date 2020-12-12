@@ -13,10 +13,28 @@ module.exports = (sequelize) => {
         // Course title Column
         title: {
             type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'Please provide a course "title"',
+                },
+                notEmpty: {
+                    msg: 'Please provide a course "title"',
+                },
+            },
         },
         // Course Description Column
         description: {
             type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'Please provide a course "description"',
+                },
+                notEmpty: {
+                    msg: 'Please provide a course "title"',
+                },
+            },
         },
         // Estimated Time Column
         estimatedTime: {
