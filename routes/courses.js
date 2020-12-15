@@ -44,7 +44,7 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     try {
         let course = await Course.create(req.body);
-        return res.status(201).location(`/courses/${course.id}`).end();
+        res.status(201).location(`/courses/${course.id}`).end();
     } catch (error) {
         if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
             const errors = error.errors.map(err => err.message);
@@ -57,13 +57,19 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 
 // PUT update corresponding course
 router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
-    const course = await Course.findByPk(req.params.id);
     try {
-        if (course && course.userId === req.currentUser.id) {
-            await course.update(req.body);
-            return res.status(204).location('/').end();
+        const course = await Course.findByPk(req.params.id);
+        if (course) {
+            if (course.userId !== req.currentUser.id) {
+                res.status(403).json({
+                    error: "You can't update someone else's course"
+                })
+            } else {
+                await course.update(req.body);
+                res.status(204).end();
+            }
         } else {
-            return res.status(403)
+            return res.status(404)
         }
     } catch (error) {
         if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
@@ -84,7 +90,7 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) =>
             res.status(403).end();
         } else {
             await course.destroy();
-            return res.status(204).end()
+            res.status(204).end()
         }
     } else {
         const error = new Error('Course not found');
